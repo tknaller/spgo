@@ -57,15 +57,19 @@ export class WorkspaceHelper{
         let matchCount : number = fileUri.replace(config.sharePointSiteUrl, '').length;
         let subSiteMatchCount : number = 0;
         let siteUri : Uri = Uri.parse(config.sharePointSiteUrl)
-
+        let matches = 0;
         if( config.subSites){
             for (let subSite of config.subSites){
 
                 subSiteMatchCount = fileUri.replace(subSite.sharePointSiteUrl, '').length;
                 if(subSiteMatchCount < matchCount){
                     siteUri = Uri.parse(subSite.sharePointSiteUrl)
+                    matches++;
                 }
             }
+        }
+        if (matches > 1) {
+            throw new Error(`found more than one match for ${fileUri} in the config file. Please check your config file and try again. If you are using subSites, make sure that the subSites are listed in order of most specific to least specific. For example, if you have a subSite for /sites/MySite and a subSite for /sites, make sure that the subSite for /sites/MySite is listed first. This will ensure that the correct subSite is selected for the fileUri provide`);
         }
 
         return siteUri;
